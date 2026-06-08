@@ -92,6 +92,50 @@ def parse_input(job_input):
     job_input = dict(job_input)
     apply_input_safeguards(job_input)
 
+    # 0. Check for raw book/story input (either as text or a remote URL)
+    text_content = job_input.get("text") or job_input.get("book_text")
+    book_url = job_input.get("book_url")
+    
+    if text_content or book_url:
+        from analyzer import analyze_book, analyze_raw_text
+        max_scenes = job_input.get("max_scenes", 3)
+        scene_window = job_input.get("scene_window", 3)
+        
+        # Resolve other parameters to pass to all scenes
+        global_opts = {k: v for k, v in job_input.items() if k not in ("text", "book_text", "book_url", "max_scenes", "scene_window")}
+        
+        if book_url:
+            suffix = ""
+            parsed_filename = book_url.split("/")[-1].split("?")[0]
+            if "." in parsed_filename:
+                suffix = "." + parsed_filename.split(".")[-1]
+            else:
+                suffix = ".txt"
+                
+            print(f"Downloading book from URL: {book_url}")
+            local_book_path = download_file_to_temp(book_url, suffix)
+            try:
+                scenes = analyze_book(local_book_path, max_scenes=max_scenes, scene_window=scene_window)
+            finally:
+                try:
+                    os.unlink(local_book_path)
+                except Exception:
+                    pass
+        else:
+            print("Analyzing raw book text...")
+            scenes = analyze_raw_text(text_content, max_scenes=max_scenes, scene_window=scene_window)
+
+        if not scenes:
+            raise ValueError("No valid scenes could be extracted from the book or text.")
+
+        # Apply global options and safeguards
+        for scene in scenes:
+            for k, v in global_opts.items():
+                if k not in scene:
+                    scene[k] = v
+            apply_input_safeguards(scene)
+        return scenes
+
     # 1. Check for nested list of scenes (e.g. story mode / multiscene)
     if "scenes" in job_input and isinstance(job_input["scenes"], list):
         scenes = job_input["scenes"]
