@@ -1,0 +1,15 @@
+fastapi>=0.115.0
+uvicorn[standard]>=0.30.0
+pydantic>=2.8.0
+python-multipart>=0.0.9
+PyPDF2>=3.0.1
+transformers>=4.44.0
+peft>=0.12.0
+accelerate>=0.34.0
+sentence-transformers>=3.0.1
+diffusers>=0.38.0
+safetensors>=0.4.5
+huggingface_hub>=0.24.0
+hf_transfer>=0.1.8
+runpod
+boto3

@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.env
+outputs/
+tmp/
+models/
+Wan2GP/
+Wan2GP-main/

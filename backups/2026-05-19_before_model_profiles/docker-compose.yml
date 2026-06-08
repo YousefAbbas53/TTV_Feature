@@ -1,0 +1,33 @@
+version: "3.8"
+
+services:
+  video-api:
+    build: .
+    image: video-api:latest
+    container_name: video-api
+    restart: unless-stopped
+    gpus: all
+    ports:
+      - "8000:8000"
+    environment:
+      VIDEO_OUTPUT_DIR: /app/outputs
+      VIDEO_TEMP_DIR: /app/tmp
+      WAN_REPO_DIR: /app/Wan2GP
+      WAN_HEADLESS_SCRIPT: /app/Wan2GP/wgp_headless_t2v_fix.py
+      WAN_TEMPLATE_PATH: /app/Wan2GP/defaults/t2v.json
+      VIDEO_API_KEY: ${VIDEO_API_KEY:-}
+      NVIDIA_VISIBLE_DEVICES: all
+      MISTRAL_ENABLED: ${MISTRAL_ENABLED:-0}
+      MISTRAL_BASE_MODEL: ${MISTRAL_BASE_MODEL:-mistralai/Mistral-7B-v0.1}
+      MISTRAL_ADAPTER_DIR: /app/models/mistral-finetuned
+    volumes:
+      - ./outputs:/app/outputs
+      - ./tmp:/app/tmp
+      - ./models:/app/models
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]

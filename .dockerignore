@@ -1,0 +1,12 @@
+.git
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+*.ipynb
+Wan2GP
+Wan2GP-main
+outputs
+tmp
+.env
+models
