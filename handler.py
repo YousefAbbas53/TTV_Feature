@@ -98,7 +98,7 @@ def parse_input(job_input):
     
     if text_content or book_url:
         from analyzer import analyze_book, analyze_raw_text
-        max_scenes = job_input.get("max_scenes", 3)
+        max_scenes = job_input.get("max_scenes", None)
         scene_window = job_input.get("scene_window", 3)
         
         # Resolve other parameters to pass to all scenes
