@@ -53,7 +53,8 @@ COPY wgp_headless_t2v_fix.py /app/Wan2GP/wgp_headless_t2v_fix.py
 
 RUN mkdir -p /app/outputs /app/tmp /app/hf_cache
 
-# Preload Wan 1.3B weights and dependencies during docker build phase
-RUN python3 preload_model.py
+# NOTE: Model weights are downloaded on first cold start (not during build)
+# because GitHub Actions build servers have no GPU, causing preload_model.py to fail.
+# RunPod workers have GPU access at runtime, so the download will succeed there.
 
 CMD ["python3", "-u", "handler.py"]
