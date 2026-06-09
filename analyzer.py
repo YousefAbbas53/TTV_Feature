@@ -11,11 +11,11 @@ def _read_book_file(book_path: str | Path) -> str:
     if not path.exists():
         raise FileNotFoundError(f"Book file not found: {path}")
 
-    suffix = path.suffix.lower()
-    if suffix == ".txt":
-        return path.read_text(encoding="utf-8", errors="replace")
+    # Normalize: check the full filename for known extensions
+    # e.g. Gutenberg URLs end in .txt.utf-8 so path.suffix == '.utf-8'
+    name_lower = path.name.lower()
 
-    if suffix == ".pdf":
+    if name_lower.endswith(".pdf"):
         try:
             from PyPDF2 import PdfReader
         except ImportError as exc:
@@ -27,7 +27,8 @@ def _read_book_file(book_path: str | Path) -> str:
             pages.append(page.extract_text() or "")
         return "\n".join(pages)
 
-    raise ValueError("Only .txt and .pdf files are supported.")
+    # Treat .txt, .txt.utf-8, .utf-8, .text, or any unknown extension as plain text
+    return path.read_text(encoding="utf-8", errors="replace")
 
 
 def analyze_raw_text(
